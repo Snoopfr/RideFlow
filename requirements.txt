@@ -7,3 +7,15 @@ streamlit-folium>=0.15.0
 pandas>=2.0.0
 numpy>=1.24.0
 plotly>=5.15.0
+streamlit
+openmeteo-requests
+requests-cache
+retry-requests
+numpy
+pandas
+gpxpy
+folium
+streamlit-folium
+geopy
+plotly
+pytz

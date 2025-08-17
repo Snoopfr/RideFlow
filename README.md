@@ -4,6 +4,8 @@
 
 RideFlow est une application web complète qui analyse vos parcours cyclistes GPX et recommande la meilleure direction à emprunter en fonction de l'évolution des conditions de vent au cours du temps.
 
+<img width="2780" height="4694" alt="Image" src="https://github.com/user-attachments/assets/2d2d41b7-1694-41c7-8f3c-2c28296dde03" />
+
 ## ✨ Fonctionnalités Principales
 
 ### 🎯 Analyse Intelligente Évolutive

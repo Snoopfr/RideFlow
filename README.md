@@ -1,4 +1,4 @@
-# 🚴‍♂️ RideFlow v2.1 - Optimiseur de Parcours Cyclistes
+# 🚴‍♂️ RideFlow - Optimiseur de Parcours Cyclistes
 
 **Optimisez vos parcours cyclistes avec l'intelligence météorologique évolutive ! 🚴‍♂️💨**
 

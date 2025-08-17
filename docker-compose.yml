@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  rideflow:
+    build: .
+    container_name: rideflow-app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./uploads:/var/www/html/uploads
+      - ./cache:/var/www/html/cache
+      - ./logs:/var/www/html/logs # CORRECTION : Mappage vers le bon chemin de logs
+    environment:
+      - PHP_TIMEZONE=Europe/Paris
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    restart: unless-stopped
+    networks:
+      - rideflow-network
+    labels:
+      - "com.docker.compose.project=rideflow"
+      - "description=RideFlow - Optimiseur de parcours cyclistes"
+
+networks:
+  rideflow-network:
+    driver: bridge
+
+volumes:
+  rideflow-uploads:
+  rideflow-cache:
+  rideflow-logs:

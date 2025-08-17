@@ -1,0 +1,98 @@
+# RideFlow Stack pour Portainer (Synology NAS)
+# Instructions d'installation:
+# 1. Copier tous les fichiers du projet dans /volume1/docker/rideflow/
+# 2. Dans Portainer, créer un nouveau stack
+# 3. Coller ce fichier YAML
+# 4. Déployer le stack
+# 5. Accéder à l'application via http://IP_SYNOLOGY:8080
+
+version: '3.8'
+
+services:
+  rideflow:
+    image: rideflow-app:latest  # CHANGEMENT : Utilise l'image déjà construite
+    container_name: rideflow-app
+    ports:
+      - "8090:80"
+    volumes:
+      # Volumes persistants sur le NAS Synology
+      - /volume1/docker/rideflow/uploads:/var/www/html/uploads
+      - /volume1/docker/rideflow/cache:/var/www/html/cache
+      - /volume1/docker/rideflow/logs:/var/log/apache2
+    environment:
+      - PHP_TIMEZONE=Europe/Paris
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    restart: unless-stopped
+    networks:
+      - rideflow-network
+    labels:
+      - "traefik.enable=false"
+      - "com.synology.package=RideFlow"
+      - "description=RideFlow - Optimiseur de parcours cyclistes basé sur le vent"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  rideflow-network:
+    driver: bridge
+
+# Instructions pour le déploiement sur Synology NAS:
+
+# 1. Prérequis:
+#    - Docker Package installé sur Synology
+#    - Portainer CE installé et configuré
+#    - Au moins 1GB d'espace libre
+
+# 2. Structure des fichiers à créer dans /volume1/docker/rideflow/:
+#    rideflow/
+#    ├── index.php
+#    ├── functions.php
+#    ├── assets/
+#    │   ├── style.css
+#    │   └── app.js
+#    ├── docker/
+#    │   └── apache.conf
+#    ├── Dockerfile
+#    ├── docker-compose.yml
+#    └── portainer-stack.yml (ce fichier)
+
+# 3. Permissions:
+#    - Définir les permissions 755 pour le dossier rideflow
+#    - Créer les sous-dossiers uploads, cache, logs avec permissions 777
+
+# 4. Dans Portainer:
+#    - Aller dans Stacks
+#    - Cliquer sur "Add stack"
+#    - Nom: rideflow
+#    - Coller ce contenu YAML
+#    - Cliquer sur "Deploy the stack"
+
+# 5. Accès:
+#    - Application disponible sur: http://[IP_SYNOLOGY]:8080
+#    - Vérifier les logs dans Containers > rideflow-app > Logs
+
+# 6. Mise à jour:
+#    - Modifier les fichiers source dans /volume1/docker/rideflow/
+#    - Dans Portainer: Stack rideflow > "Update the stack" > "Re-deploy"
+
+# 7. Sauvegarde:
+#    - Sauvegarder le dossier /volume1/docker/rideflow/
+#    - Exporter la configuration du stack depuis Portainer
+
+# 8. Dépannage:
+#    - Vérifier les logs: docker logs rideflow-app
+#    - Vérifier l'état: docker ps | grep rideflow
+#    - Redémarrer: docker restart rideflow-app
+#    - Vérifier les permissions: ls -la /volume1/docker/rideflow/
+#    - Test de connectivité: curl http://localhost:8080

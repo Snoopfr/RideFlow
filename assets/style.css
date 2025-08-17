@@ -1,0 +1,809 @@
+/* RideFlow - Styles Optimisés v2.1 */
+
+:root {
+    --primary: #0d6efd;
+    --success: #198754;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #0dcaf0;
+    --secondary: #6c757d;
+    --light: #f8f9fa;
+    --dark: #212529;
+    
+    /* Couleurs spécifiques vent */
+    --wind-favorable: #28a745;
+    --wind-unfavorable: #dc3545;
+    --wind-crosswind: #ffc107;
+    --wind-neutral: #6c757d;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-smooth: 0.3s ease-out;
+    
+    /* Ombres */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+}
+
+/* Reset et base */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+/* =================
+   COMPOSANTS UI
+   ================= */
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-text {
+    opacity: 0.9;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-fast);
+}
+
+.card:hover {
+    box-shadow: var(--shadow);
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border: none;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    border: none;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#analyze-btn small {
+    font-size: 0.7rem;
+    opacity: 0.85;
+    font-weight: 400;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Form elements */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* File input */
+.form-control[type="file"]::-webkit-file-upload-button {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    margin-right: 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.form-control[type="file"]::-webkit-file-upload-button:hover {
+    background: #5a6268;
+}
+
+/* =================
+   CARTE LEAFLET
+   ================= */
+
+/* Container principal de la carte */
+#map {
+    height: 500px !important;
+    width: 100% !important;
+    min-height: 500px !important;
+    border-radius: 0 0 12px 12px;
+    background: var(--light);
+    position: relative;
+    z-index: 1;
+}
+
+/* Container Leaflet */
+.leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+    font-size: 14px;
+    background: var(--light) !important;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Card body pour la carte */
+.card:has(#map) .card-body {
+    padding: 0 !important;
+}
+
+/* Optimisations de performance */
+.leaflet-tile {
+    image-rendering: crisp-edges;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.leaflet-zoom-animated {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Segments colorés du tracé */
+.segment-favorable {
+    stroke: var(--wind-favorable) !important;
+    stroke-width: 6 !important;
+    stroke-opacity: 0.9 !important;
+}
+
+.segment-unfavorable {
+    stroke: var(--wind-unfavorable) !important;
+    stroke-width: 6 !important;
+    stroke-opacity: 0.9 !important;
+}
+
+.segment-crosswind {
+    stroke: var(--wind-crosswind) !important;
+    stroke-width: 6 !important;
+    stroke-opacity: 0.8 !important;
+}
+
+.segment-mixed {
+    stroke: var(--wind-neutral) !important;
+    stroke-width: 5 !important;
+    stroke-opacity: 0.7 !important;
+}
+
+/* Popups Leaflet */
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+.leaflet-popup-content {
+    margin: 12px 16px;
+    line-height: 1.5;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+/* =================
+   INDICATEUR DE VENT
+   ================= */
+
+.wind-indicator-new {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.wind-arrow-container {
+    position: relative;
+    width: 50px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    transform-origin: 25px 25px;
+    transition: transform var(--transition-smooth);
+    backface-visibility: hidden;
+}
+
+.wind-arrow-container:hover {
+    transform: scale(1.1);
+}
+
+.wind-arrow-svg {
+    display: block;
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: filter var(--transition-fast);
+}
+
+.wind-arrow-svg:hover {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.wind-speed-display {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.7em;
+    white-space: nowrap;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 40px;
+    text-align: center;
+}
+
+/* =================
+   LÉGENDE ET UI
+   ================= */
+
+.legend-line {
+    width: 20px;
+    height: 4px;
+    border-radius: 2px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.legend-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.wind-arrow-legend {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* =================
+   TABLEAUX
+   ================= */
+
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background-color: var(--dark);
+    color: white;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 3px;
+}
+
+/* Badges dans les tableaux */
+.table .badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+    font-weight: 600;
+}
+
+/* =================
+   GRAPHIQUES
+   ================= */
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 1rem;
+}
+
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 250px;
+}
+
+/* =================
+   ALERTES ET MESSAGES
+   ================= */
+
+.alert {
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #0f5132;
+    border-left: 4px solid var(--success);
+}
+
+.alert-info {
+    background-color: rgba(13, 202, 240, 0.1);
+    color: #055160;
+    border-left: 4px solid var(--info);
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #664d03;
+    border-left: 4px solid var(--warning);
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #721c24;
+    border-left: 4px solid var(--danger);
+}
+
+.alert-light {
+    background-color: rgba(248, 249, 250, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* =================
+   LOADING ET ÉTATS
+   ================= */
+
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 2rem;
+    z-index: 9999;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+#loading-spinner .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
+#welcome-message {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--secondary);
+}
+
+#welcome-message .display-1 {
+    font-size: 4rem;
+    opacity: 0.5;
+}
+
+#welcome-message ol {
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* =================
+   ANIMATIONS
+   ================= */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes mapAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.map-ready {
+    animation: mapAppear var(--transition-smooth);
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* =================
+   UTILITAIRES
+   ================= */
+
+.bi {
+    margin-right: 0.25rem;
+}
+
+.table th .bi {
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.text-xs {
+    font-size: 0.75rem !important;
+}
+
+.rounded-lg {
+    border-radius: 12px !important;
+}
+
+/* Focus pour accessibilité */
+.btn:focus,
+.form-control:focus,
+input[type="file"]:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* =================
+   RESPONSIVE DESIGN
+   ================= */
+
+@media (max-width: 768px) {
+    /* Navigation */
+    .navbar-text {
+        display: none;
+    }
+    
+    /* Carte */
+    #map {
+        height: 350px !important;
+        min-height: 350px !important;
+    }
+    
+    /* Flèche de vent */
+    .wind-arrow-container {
+        width: 40px;
+        height: 60px;
+    }
+    
+    .wind-arrow-svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .wind-speed-display {
+        top: 42px;
+        font-size: 0.65em;
+        padding: 1px 4px;
+        min-width: 35px;
+    }
+    
+    /* Tableaux */
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Cards */
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .card-header h5,
+    .card-header h6 {
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+    
+    /* Graphiques */
+    canvas {
+        max-height: 200px;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+    
+    /* Alertes */
+    .alert {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Message d'accueil */
+    #welcome-message .display-1 {
+        font-size: 3rem;
+    }
+    
+    #welcome-message .alert-light {
+        font-size: 0.85rem;
+    }
+    
+    /* Performance : désactiver les effets coûteux */
+    .card:hover,
+    .btn:hover:not(:disabled),
+    .wind-arrow-container:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+}
+
+@media (max-width: 576px) {
+    /* Carte encore plus petite */
+    #map {
+        height: 300px !important;
+        min-height: 300px !important;
+    }
+    
+    /* Flèche de vent */
+    .wind-arrow-container {
+        width: 35px;
+        height: 55px;
+    }
+    
+    .wind-arrow-svg {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .wind-speed-display {
+        top: 37px;
+        font-size: 0.6em;
+        padding: 1px 3px;
+        min-width: 30px;
+    }
+    
+    /* Buttons */
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    /* Graphiques */
+    canvas {
+        max-height: 180px;
+    }
+    
+    .chart-container {
+        height: 180px;
+    }
+    
+    /* Message d'accueil */
+    #welcome-message {
+        min-height: 300px;
+        padding: 1rem;
+    }
+    
+    #welcome-message .display-1 {
+        font-size: 2.5rem;
+    }
+}
+
+/* =================
+   MODE IMPRESSION
+   ================= */
+
+@media print {
+    /* Masquer les éléments non nécessaires */
+    .navbar,
+    .btn,
+    #loading-spinner,
+    footer,
+    .wind-speed-label {
+        display: none !important;
+    }
+    
+    /* Carte pour impression */
+    #map {
+        height: 400px !important;
+        width: 100% !important;
+        background: white !important;
+        border: 2px solid #000 !important;
+    }
+    
+    .leaflet-container {
+        height: 400px !important;
+        background: white !important;
+    }
+    
+    /* Cards */
+    .card {
+        border: 1px solid #000 !important;
+        margin-bottom: 1rem !important;
+        break-inside: avoid;
+        box-shadow: none !important;
+    }
+    
+    /* Flèche de vent */
+    .wind-arrow-container {
+        background: white !important;
+        border: 2px solid #000 !important;
+        border-radius: 50%;
+    }
+    
+    .wind-arrow-svg circle {
+        stroke: #000 !important;
+        stroke-width: 2 !important;
+    }
+    
+    .wind-arrow-svg path {
+        fill: #000 !important;
+        stroke: #fff !important;
+    }
+    
+    .wind-speed-display {
+        background: #000 !important;
+        color: #fff !important;
+        border: 1px solid #000 !important;
+    }
+    
+    /* Tableaux */
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .table th {
+        background: #000 !important;
+        color: #fff !important;
+    }
+}
+
+/* =================
+   PERFORMANCE ET DEBUG
+   ================= */
+
+/* Force l'accélération GPU pour éviter les bugs d'affichage */
+.leaflet-interactive,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Conteneur de débogage si nécessaire */
+.debug-map {
+    border: 3px solid red !important;
+    background: yellow !important;
+}
+
+/* Éviter les débordements */
+.container-fluid,
+.row,
+.col-lg-9 {
+    overflow-x: visible;
+}
+
+/* =================
+   ÉTATS SPÉCIAUX
+   ================= */
+
+/* Badge d'impact du vent */
+.impact-badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.impact-favorable {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: var(--success);
+    border: 1px solid rgba(25, 135, 84, 0.3);
+}
+
+.impact-unfavorable {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: var(--danger);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.impact-mixed {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #b08800;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* Footer */
+footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid #dee2e6;
+    background: var(--light);
+}
+
+footer a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+footer a:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}

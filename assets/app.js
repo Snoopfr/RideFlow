@@ -1,8 +1,3 @@
-/**
- * RideFlow Application - Version Refactorisée v2.1
- * Analyseur de conditions de vent pour cyclistes
- */
-
 class RideFlow {
     constructor() {
         this.gpxData = null;

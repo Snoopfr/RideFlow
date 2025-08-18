@@ -744,7 +744,7 @@ class RideFlow {
 
         tableBody.innerHTML = '';
         
-        const segmentGroups = this.groupSegments(this.windData.segments, 20);
+        const segmentGroups = this.groupSegmentsByWindImpact(this.windData.segments, 1.0);
         
         segmentGroups.forEach(group => {
             const row = this.createSegmentTableRow(group);
@@ -768,7 +768,7 @@ class RideFlow {
      */
     createSegmentTableRow(group) {
         const stats = this.calculateGroupStats(group);
-        console.log('stats.avgWindDirection:', stats.avgWindDirection); // <-- à supprimer
+        console.log('stats.avgWindDirection:', stats.avgWindDirection);
         const row = document.createElement('tr');
         
         row.innerHTML = `
@@ -1018,31 +1018,33 @@ class RideFlow {
         const index = Math.round(bearing / 22.5) % 16;
         return directions[index];
     }
+
     /**
- * Convertit une direction textuelle en icône de direction
- */
-getDirectionIcon(direction) {
-    const directionIcons = {
-        'N': '⬆️',
-        'NNE': '↗️', 
-        'NE': '↗️',
-        'ENE': '↗️',
-        'E': '➡️',
-        'ESE': '↘️',
-        'SE': '↘️', 
-        'SSE': '↘️',
-        'S': '⬇️',
-        'SSO': '↙️',
-        'SO': '↙️',
-        'OSO': '↙️', 
-        'O': '⬅️',
-        'ONO': '↖️',
-        'NO': '↖️',
-        'NNO': '↖️'
-    };
-    
-    return directionIcons[direction] || '🧭';
-}
+     * Convertit une direction textuelle en icône de direction
+     */
+    getDirectionIcon(direction) {
+        const directionIcons = {
+            'N': '⬆️',
+            'NNE': '↗️', 
+            'NE': '↗️',
+            'ENE': '↗️',
+            'E': '➡️',
+            'ESE': '↘️',
+            'SE': '↘️', 
+            'SSE': '↘️',
+            'S': '⬇️',
+            'SSO': '↙️',
+            'SO': '↙️',
+            'OSO': '↙️', 
+            'O': '⬅️',
+            'ONO': '↖️',
+            'NO': '↖️',
+            'NNO': '↖️'
+        };
+        
+        return directionIcons[direction] || '🧭';
+    }
+
     calculateDistance(coord1, coord2) {
         const R = 6371;
         const lat1 = coord1[0] * Math.PI / 180;
@@ -1165,6 +1167,70 @@ getDirectionIcon(direction) {
             this.clearMapLayers();
             this.map.setView([48.8566, 2.3522], 10);
         }
+    }
+
+    /**
+     * Regroupe dynamiquement les segments par type de vent avec fusion des micro-groupes
+     */
+    groupSegmentsByWindImpact(segments, minDistanceKm = 1.0) {
+        console.log("🟢 Regroupement dynamique activé");
+        const groups = [];
+        let currentGroup = [];
+        let currentImpact = segments[0]?.wind_impact || 'mixed';
+
+        for (let i = 0; i < segments.length; i++) {
+            const segment = segments[i];
+
+            if (segment.wind_impact === currentImpact) {
+                currentGroup.push(segment);
+            } else {
+                const distance = currentGroup.reduce((sum, s) => sum + s.distance, 0);
+
+                if (distance < minDistanceKm && groups.length > 0) {
+                    groups[groups.length - 1] = groups[groups.length - 1].concat(currentGroup);
+                } else {
+                    groups.push(currentGroup);
+                }
+
+                currentGroup = [segment];
+                currentImpact = segment.wind_impact;
+            }
+        }
+
+        if (currentGroup.length > 0) {
+            const distance = currentGroup.reduce((sum, s) => sum + s.distance, 0);
+            if (distance < minDistanceKm && groups.length > 0) {
+                groups[groups.length - 1] = groups[groups.length - 1].concat(currentGroup);
+            } else {
+                groups.push(currentGroup);
+            }
+        }
+
+        console.log("➡️ Nombre de groupes créés :", groups.length);
+        return groups;
+    }
+
+    /**
+     * Prépare les groupes de coordonnées pour l'affichage des segments par zones homogènes
+     */
+    groupCoordinatesByWindImpact(coords, segments, minDistanceKm = 1.0) {
+        const groupedSegments = this.groupSegmentsByWindImpact(segments, minDistanceKm);
+        const groupedCoords = [];
+        let coordIndex = 0;
+
+        groupedSegments.forEach(group => {
+            const groupCoords = [];
+
+            for (let i = 0; i < group.length; i++) {
+                groupCoords.push(coords[coordIndex]);
+                coordIndex++;
+            }
+
+            groupCoords.push(coords[coordIndex]);
+            groupedCoords.push({ coords: groupCoords, windImpact: group[0].wind_impact });
+        });
+
+        return groupedCoords;
     }
 }
 

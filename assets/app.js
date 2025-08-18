@@ -16,8 +16,8 @@ class RideFlow {
      */
     async init() {
         this.setupEventListeners();
-        await this.initializeMap();
         this.initializeDateTime();
+        await this.initializeMap();
     }
 
     /**
